@@ -1,0 +1,6 @@
+[package]
+name = "rusty_access_machine"
+version = "0.1.0"
+authors = ["Valentin Brandl <vbrandl@riseup.net>"]
+
+[dependencies]

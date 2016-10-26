@@ -1,0 +1,95 @@
+use std::error::Error;
+use std::env;
+use std::fs::File;
+use std::io::prelude::*;
+use std::path::Path;
+use std::process::exit;
+
+#[derive(Debug)]
+enum Operator {
+    ADD,
+    SUB,
+    MUL,
+    DIV,
+    LDA,
+    LDK,
+    STA,
+    INP,
+    OUT,
+    HLT,
+    JMP,
+    JEZ,
+    JNE,
+    JLZ,
+    JLE,
+    JGZ,
+    JGE,
+}
+
+struct Instruction {
+    operator: Operator,
+    operand: u16,
+}
+
+fn read_file(path: &str) -> String {
+    let path = Path::new(&path);
+    let display = path.display();
+
+    let mut file = match File::open(&path) {
+        Err(why) => panic!("couldn't open {}: {}", display, why.description()),
+        Ok(file) => file,
+    };
+
+    let mut s = String::new();
+    match file.read_to_string(&mut s) {
+        Err(why) => panic!("couldn't read {}: {}", display, why.description()),
+        Ok(_) => return s,
+    };
+}
+
+fn compile_line(line: &str) -> Instruction {
+    let clean = line.trim();
+    let v: Vec<&str> = clean.split(';').collect();
+    let clean = v[0];
+    let v: Vec<&str> = clean.splitn(2, ' ').collect();
+
+    let op: Operator = match v[0].to_uppercase().trim() {
+        "ADD" => Operator::ADD,
+        "SUB" => Operator::SUB,
+        "MUL" => Operator::MUL,
+        "DIV" => Operator::DIV,
+        "LDA" => Operator::LDA,
+        "LDK" => Operator::LDK,
+        "STA" => Operator::STA,
+        "INP" => Operator::INP,
+        "OUT" => Operator::OUT,
+        "HLT" => Operator::HLT,
+        "JMP" => Operator::JMP,
+        "JEZ" => Operator::JEZ,
+        "JNE" => Operator::JNE,
+        "JLZ" => Operator::JLZ,
+        "JLE" => Operator::JLE,
+        "JGZ" => Operator::JGZ,
+        "JGE" => Operator::JGE,
+        _     => panic!("Illegal operator {}", v[0]),
+    };
+    let operand: u16 = match v[1].trim().parse::<u16>() {
+        Ok(n)   => n,
+        Err(e)  => panic!("Invalid number {}\n{}", v[1], e),
+    };
+
+    Instruction { operator: op, operand: operand }
+}
+
+fn main() {
+    let args: Vec<String> = env::args().collect();
+    println!("{}", args[0]);
+    if args.len() < 2 {
+        println!("Usage: {} filename", args[0]);
+        exit(1);
+    }
+    let i = compile_line("   ADD 0x00   ; comment");
+    println!("{:?} {}", i.operator, i.operand);
+    let content = read_file(&args[1]);
+    let lines: Vec<&str> = content.split('\n').collect();
+}
