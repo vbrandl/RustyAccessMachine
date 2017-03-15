@@ -1,5 +1,8 @@
 # Rusty-access machine
 
+[![Build
+Status](https://travis-ci.org/vbrandl/RustyAccessMachine.svg?branch=master)](https://travis-ci.org/vbrandl/RustyAccessMachine)
+
 ## General
 
 This is a implementation of the random-access machine based on the model described in https://github.com/vbrandl/RandomAccessMachine but implemented in rust. Data is stored in 16bit integer numbers and a address space of 256 fields.
